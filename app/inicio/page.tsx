@@ -7,20 +7,17 @@ export default function Page() {
       <Link href={"/cerrarFolio"}>
         <Typography variant="h4">Cerrar Folio</Typography>
       </Link>
-      <form
-        action={async () => {
+      <Button
+        variant="contained"
+        color="error"
+        sx={{ padding: "10px 20px" }}
+        onClick={async () => {
           "use server";
           await signOut();
         }}
       >
-        <Button
-          variant="contained"
-          color="error"
-          sx={{ padding: "10px 20px" }}
-        >
-          Cerrar Sesion
-        </Button>
-      </form>
+        Cerrar Sesion
+      </Button>
     </Box>
   );
 }
