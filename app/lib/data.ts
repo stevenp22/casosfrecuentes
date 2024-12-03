@@ -1,4 +1,6 @@
 import sql from "mssql";
+import mysql from "mysql2/promise";
+import { User } from "./definitions";
 
 const sqlConfig = {
   user: process.env.SQL_USERNAME || "",
@@ -11,12 +13,54 @@ const sqlConfig = {
   },
 };
 
+const mySqlConfig = {
+  user: process.env.MYSQL_USERNAME || "",
+  password: process.env.MYSQL_PASSWORD || "",
+  host: process.env.MYSQL_HOST || "",
+  port: parseInt(process.env.MYSQL_PORT || ""),
+  database: process.env.MYSQL_DATABASE || "",
+};
+
 async function conectarDB() {
   try {
     await sql.connect(sqlConfig);
     console.log("Conexión exitosa");
   } catch (err) {
     console.error("Error de conexión:", err);
+  }
+}
+
+export async function usuarios() {
+  const connection = await mysql.createConnection(mySqlConfig);
+  try {
+    const [results] = await connection.query("SELECT * FROM Usuarios");
+    return results;
+  } catch (error) {
+    console.error("Failed to fetch users:", error);
+    throw new Error("Failed to fetch users.");
+  } finally {
+    if (connection) {
+      await connection.end();
+    }
+  }
+}
+
+export async function usuario(documento: string): Promise<User | undefined> {
+  const connection = await mysql.createConnection(mySqlConfig);
+  try {
+    const [results] = await connection.query(
+      "SELECT * FROM Usuarios WHERE documento = ?",
+      [documento]
+    );
+    const resultados = results as User[];
+    return resultados[0];
+  } catch (error) {
+    console.error("Failed to fetch users:", error);
+    throw new Error("Failed to fetch users.");
+  } finally {
+    if (connection) {
+      await connection.end();
+    }
   }
 }
 

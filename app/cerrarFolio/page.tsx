@@ -1,7 +1,9 @@
 import Folios from "./buscarFolios";
 import VerFolios from "./verFolios";
 import { cerrarFolio, verificarPacienteyFolio } from "../lib/actions";
-import { Box } from "@mui/material";
+import { Box, Container } from "@mui/material";
+import { Folio } from "../lib/definitions";
+import RegresarInicio from "../componentes/regresarInicio";
 
 export default async function Page(props: {
   searchParams?: Promise<{
@@ -14,17 +16,31 @@ export default async function Page(props: {
   const tipoDocumento = searchParams?.tipoDocumento || "";
   const documento = searchParams?.documento || "";
   const folio = searchParams?.folio || "";
-  const folios =
-    (await verificarPacienteyFolio(tipoDocumento, documento)) || [];
+  let folios: Folio[] = [];
+  if (tipoDocumento != "" || documento != "") {
+    folios = (await verificarPacienteyFolio(tipoDocumento, documento)) || [];
+  }
   let resultado: number[] = [];
-  if (folio) {
-    resultado =
-      (await cerrarFolio(tipoDocumento, documento, folio)) || [];
+  if (folio != "") {
+    resultado = (await cerrarFolio(tipoDocumento, documento, folio)) || [];
   }
   return (
-    <Box component="section" sx={{ p: 4 }}>
-      <Folios />
-      <VerFolios folios={folios} resultado={resultado} />
-    </Box>
+    <div>
+      <RegresarInicio />
+      <Container maxWidth="sm">
+        <Box
+          display="flex"
+          flexDirection="column"
+          alignItems="center"
+          justifyContent="top"
+          minHeight="100vh"
+          padding={2}
+        >
+          <Folios />
+
+          <VerFolios folios={folios} resultado={resultado} />
+        </Box>
+      </Container>
+    </div>
   );
 }

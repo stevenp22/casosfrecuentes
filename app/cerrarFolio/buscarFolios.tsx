@@ -23,8 +23,9 @@ export default function Folios() {
   const onSubmit = (event: React.FormEvent) => {
     event.preventDefault();
     const params = new URLSearchParams(searchParams);
-    const documento = (document.getElementById("documento") as HTMLInputElement)
-      .value.trim();
+    const documento = (
+      document.getElementById("documento") as HTMLInputElement
+    ).value.trim();
     if (documento) {
       params.set("tipoDocumento", tipoDocumento);
       params.set("documento", documento);
@@ -39,7 +40,7 @@ export default function Folios() {
     <form onSubmit={onSubmit}>
       <FormControl>
         <FormLabel>Cerrar Folio</FormLabel>
-        <Stack direction="row" spacing={2}>
+        <Stack direction="row" spacing={2} style={{ marginTop: "16px" }}>
           <Select
             id="tipoDocumento"
             name="tipoDocumento"
@@ -59,7 +60,7 @@ export default function Folios() {
             defaultValue={searchParams.get("documento")?.toString()}
           />
         </Stack>
-        <Button variant="contained" type="submit">
+        <Button variant="contained" type="submit" style={{ marginTop: "16px" }}>
           Buscar folio
         </Button>
       </FormControl>
