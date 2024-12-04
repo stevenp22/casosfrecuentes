@@ -1,13 +1,13 @@
 "use client";
 import {
   FormControl,
-  FormLabel,
   TextField,
   Stack,
   Select,
   MenuItem,
   Button,
   SelectChangeEvent,
+  Typography,
 } from "@mui/material";
 import { useState } from "react";
 import { useSearchParams, usePathname, useRouter } from "next/navigation";
@@ -39,7 +39,9 @@ export default function Folios() {
   return (
     <form onSubmit={onSubmit}>
       <FormControl>
-        <FormLabel>Cerrar Folio</FormLabel>
+      <Typography variant="h4" component="h1" gutterBottom>
+        Asignar Cama
+      </Typography>
         <Stack direction="row" spacing={2} style={{ marginTop: "16px" }}>
           <Select
             id="tipoDocumento"

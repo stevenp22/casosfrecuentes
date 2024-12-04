@@ -1,7 +1,7 @@
 import Folios from "./buscarFolios";
 import VerFolios from "./verFolios";
 import { cerrarFolio, verificarPacienteyFolio } from "../lib/actions";
-import { Box, Container } from "@mui/material";
+import { Container } from "@mui/material";
 import { Folio } from "../lib/definitions";
 import RegresarInicio from "../componentes/regresarInicio";
 
@@ -25,22 +25,11 @@ export default async function Page(props: {
     resultado = (await cerrarFolio(tipoDocumento, documento, folio)) || [];
   }
   return (
-    <div>
+      <Container>
       <RegresarInicio />
-      <Container maxWidth="sm">
-        <Box
-          display="flex"
-          flexDirection="column"
-          alignItems="center"
-          justifyContent="top"
-          minHeight="100vh"
-          padding={2}
-        >
           <Folios />
 
           <VerFolios folios={folios} resultado={resultado} />
-        </Box>
       </Container>
-    </div>
   );
 }

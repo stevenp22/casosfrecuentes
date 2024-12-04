@@ -7,3 +7,12 @@ export type User = {
   documento: string;
   contraseña: string;
 };
+
+export type Ingreso = {
+  MPNumC: string;
+  MPCodP: string;
+  ClaPro: string;
+  MPTDoc: string;
+  IngCsc: string;
+  IngEntDx: string;
+};

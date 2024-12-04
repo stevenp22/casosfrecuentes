@@ -4,6 +4,9 @@ import { signOut } from "@/auth";
 export default function Page() {
   return (
     <Box>
+      <Link href={"/asignarCama"}>
+        <Typography variant="h4">Asignar Cama</Typography>
+      </Link>
       <Link href={"/cerrarFolio"}>
         <Typography variant="h4">Cerrar Folio</Typography>
       </Link>
