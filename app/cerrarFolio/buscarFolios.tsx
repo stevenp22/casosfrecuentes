@@ -40,7 +40,7 @@ export default function Folios() {
     <form onSubmit={onSubmit}>
       <FormControl>
       <Typography variant="h4" component="h1" gutterBottom>
-        Asignar Cama
+        Cerrar folio
       </Typography>
         <Stack direction="row" spacing={2} style={{ marginTop: "16px" }}>
           <Select

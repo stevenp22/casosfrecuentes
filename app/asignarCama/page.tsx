@@ -31,6 +31,7 @@ export default function AsignarCama() {
         onChange={(e) => setDocumento(e.target.value)}
         fullWidth
         margin="normal"
+        required
       />
       <Button variant="contained" color="primary" onClick={handleAsignarCama}>
         Asignar Cama

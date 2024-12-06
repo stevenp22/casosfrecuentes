@@ -1,12 +1,16 @@
 "use server";
 import {
   asignarCamaDB,
+  cambioContratoDB,
   cerrarFolioDB,
+  consultaHistoriaContrato,
+  consultaIngresoContrato,
   consultaIngresoDB,
   foliosAbiertosPaciente,
   usuario,
   usuarios,
   verificarIngreso,
+  consultaContratosDB,
 } from "./data";
 import { signIn } from "@/auth";
 import { AuthError } from "next-auth";
@@ -118,6 +122,88 @@ export async function asignarCama(documento: string) {
     }
   } catch (error) {
     console.log("Error consultar el ingreso en actions", error);
+    throw error;
+  }
+}
+
+export async function consultaContratos(documento: string) {
+  try {
+    const resultado = await consultaContratosDB(documento);
+    console.log("Resultado de la busqueda de consultaContratos", resultado);
+    return resultado;
+  } catch (error) {
+    console.log("Error al usar consultaContratos", error);
+    throw error;
+  }
+}
+
+export async function cambioContrato(
+  documento: string,
+  año: number,
+  mes: number,
+  dia: number,
+  folio1: number,
+  folio2: number,
+  contratoNuevo: string
+) {
+  let nitContrato;
+  let consecutivoIngreso;
+  let contratoAnterior;
+  try {
+    const resultadoIngreso = await consultaIngresoContrato(
+      documento,
+      año,
+      mes,
+      dia
+    );
+    //console.log("Resultado de la busqueda de consultaIngresoContrato", resultado);
+    nitContrato = resultadoIngreso.IngNit;
+    consecutivoIngreso = resultadoIngreso.IngCsc;
+  } catch (error) {
+    console.log("Error al usar consultaIngresoContrato", error);
+    throw error;
+  }
+  try {
+    const resultadoContrato = await consultaIngresoContrato(
+      documento,
+      año,
+      mes,
+      dia
+    );
+    //console.log("Resultado de la busqueda de consultaHistoriaContrato", resultado);
+    contratoAnterior = resultadoContrato.FHCCodCto;
+  } catch (error) {
+    console.log("Error al usar consultaIngresoContrato", error);
+    throw error;
+  }
+  try {
+    const resultadoContrato = await consultaHistoriaContrato(
+      documento,
+      año,
+      folio1,
+      folio2
+    );
+    //console.log("Resultado de la busqueda de consultaHistoriaContrato", resultado);
+    contratoAnterior = resultadoContrato.FHCCodCto;
+  } catch (error) {
+    console.log("Error al usar consultaIngresoContrato", error);
+    throw error;
+  }
+  try {
+    const resultado = await cambioContratoDB(
+      documento,
+      año,
+      folio1,
+      folio2,
+      contratoNuevo,
+      contratoAnterior,
+      nitContrato,
+      consecutivoIngreso
+    );
+    //console.log("Resultado de cambioContratoDB", resultado);
+    return resultado;
+  } catch (error) {
+    console.log("Error al usar consultaIngresoContrato", error);
     throw error;
   }
 }

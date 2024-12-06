@@ -16,3 +16,8 @@ export type Ingreso = {
   IngCsc: string;
   IngEntDx: string;
 };
+
+export type Contrato = {
+  MENNIT: string;
+  MENOMB: string;
+};
