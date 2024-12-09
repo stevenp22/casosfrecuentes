@@ -7,11 +7,14 @@ export default function Page() {
       <Link href={"/asignarCama"}>
         <Typography variant="h4">Asignar Cama</Typography>
       </Link>
+      <Link href={"/cambioContrato"}>
+        <Typography variant="h4">Cambiar Contrato</Typography>
+      </Link>
       <Link href={"/cerrarFolio"}>
         <Typography variant="h4">Cerrar Folio</Typography>
       </Link>
-      <Link href={"/cambioContrato"}>
-        <Typography variant="h4">Cambiar Contrato</Typography>
+      <Link href={"/desconfirmarCita"}>
+        <Typography variant="h4">Desconfirmar Cita</Typography>
       </Link>
       <Button
         variant="contained"
