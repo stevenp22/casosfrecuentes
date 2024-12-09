@@ -11,6 +11,9 @@ import {
   usuarios,
   verificarIngreso,
   consultaContratosDB,
+  consultaCita,
+  desconfirmarCitaDB,
+  consultaCitasDB,
 } from "./data";
 import { signIn } from "@/auth";
 import { AuthError } from "next-auth";
@@ -58,6 +61,12 @@ export async function verificarPacienteyFolio(
   tipoDocumento: string,
   documento: string
 ) {
+  if (!documento || documento.trim() === "") {
+    throw new Error("Invalid document number");
+  }
+  if (!tipoDocumento || tipoDocumento.trim() === "") {
+    throw new Error("Invalid document number");
+  }
   try {
     const paciente = await verificarIngreso(documento);
     if (paciente !== undefined && paciente > 0) {
@@ -74,6 +83,15 @@ export async function cerrarFolio(
   documento: string,
   folio: string
 ) {
+  if (!documento || documento.trim() === "") {
+    throw new Error("Invalid document number");
+  }
+  if (!tipoDocumento || tipoDocumento.trim() === "") {
+    throw new Error("Invalid document type");
+  }
+  if (!folio || folio.trim() === "") {
+    throw new Error("Invalid folio");
+  }
   try {
     const folios = await cerrarFolioDB(tipoDocumento, documento, folio);
     return folios;
@@ -83,6 +101,9 @@ export async function cerrarFolio(
 }
 
 export async function asignarCama(documento: string) {
+  if (!documento || documento.trim() === "") {
+    throw new Error("Invalid document number");
+  }
   function getCurrentDate() {
     const currentDate = new Date();
     const year = currentDate.getFullYear();
@@ -204,6 +225,49 @@ export async function cambioContrato(
     return resultado;
   } catch (error) {
     console.log("Error al usar consultaIngresoContrato", error);
+    throw error;
+  }
+}
+
+export async function desconfirmarCita(
+  documento: string,
+  cita: number,
+  citProcedimiento: string
+) {
+  if (!documento || documento.trim() === "") {
+    throw new Error("Invalid document number");
+  }
+  if (!cita || cita === 0) {
+    throw new Error("Invalid appointment number");
+  }
+  if (!citProcedimiento || citProcedimiento.trim() === "") {
+    throw new Error("Invalid appointment procedure");
+  }
+  try {
+    const resultadoCita = await consultaCita(cita);
+    console.log("Resultado de desconfirmarCita", resultadoCita);
+    const citFolio = resultadoCita.CitFolio;
+    const citTipoDoc = resultadoCita.CitTipDoc;
+    const resultado = await desconfirmarCitaDB(
+      cita,
+      documento,
+      citTipoDoc,
+      citFolio,
+      citProcedimiento
+    );
+    return resultado;
+  } catch (error) {
+    console.log("Error al desconfirmar cita", error);
+  }
+}
+
+export async function consultarCitas(documento: string) {
+  try {
+    const resultado = await consultaCitasDB(documento);
+    console.log("Resultado de la busqueda de consultaCita", resultado);
+    return resultado;
+  } catch (error) {
+    console.log("Error al usar consultaCita", error);
     throw error;
   }
 }

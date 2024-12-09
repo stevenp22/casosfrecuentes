@@ -10,6 +10,9 @@ export default function Page() {
       <Link href={"/cerrarFolio"}>
         <Typography variant="h4">Cerrar Folio</Typography>
       </Link>
+      <Link href={"/cambioContrato"}>
+        <Typography variant="h4">Cambiar Contrato</Typography>
+      </Link>
       <Button
         variant="contained"
         color="error"

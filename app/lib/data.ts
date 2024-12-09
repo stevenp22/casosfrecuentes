@@ -82,9 +82,6 @@ export async function usuario(documento: string): Promise<User | undefined> {
 }
 
 export async function verificarIngreso(documento: string) {
-  if (!documento || documento.trim() === "") {
-    throw new Error("Invalid document number");
-  }
   try {
     await initializeDBConnection();
     const resultadoPaciente =
@@ -104,12 +101,6 @@ export async function foliosAbiertosPaciente(
   tipoDocumento: string,
   documento: string
 ) {
-  if (!documento || documento.trim() === "") {
-    throw new Error("Invalid document number");
-  }
-  if (!tipoDocumento || tipoDocumento.trim() === "") {
-    throw new Error("Invalid document type");
-  }
   try {
     await initializeDBConnection();
     const resultadoFolios =
@@ -130,15 +121,6 @@ export async function cerrarFolioDB(
   documento: string,
   folio: string
 ) {
-  if (!documento || documento.trim() === "") {
-    throw new Error("Invalid document number");
-  }
-  if (!tipoDocumento || tipoDocumento.trim() === "") {
-    throw new Error("Invalid document type");
-  }
-  if (!folio || folio.trim() === "") {
-    throw new Error("Invalid folio");
-  }
   try {
     await initializeDBConnection();
     const cerrarFolio =
@@ -157,9 +139,6 @@ export async function cerrarFolioDB(
 export async function consultaIngresoDB(documento: string) {
   function getLastArrayValue(arr: Ingreso[]) {
     return arr[arr.length - 1];
-  }
-  if (!documento || documento.trim() === "") {
-    throw new Error("Invalid document number");
   }
   try {
     await initializeDBConnection();
@@ -417,6 +396,92 @@ export async function cambioContratoDB(
     return resultCambio.rowsAffected;
   } catch (error) {
     console.log("Error al cambiar el contrato en data", error);
+    throw error;
+  } finally {
+    if (connectionPool) {
+      await connectionPool.close();
+      connectionPool = null;
+    }
+  }
+}
+
+export async function consultaCita(cita: number) {
+  if (!cita || isNaN(cita)) {
+    throw new Error("Invalid appointment number");
+  }
+  try {
+    await initializeDBConnection();
+    const resultCita =
+      await sql.query`SELECT * FROM CITMED1 WHERE CitNum = ${cita}`;
+    return resultCita.recordset[0];
+  } catch (error) {
+    console.log("Error al consultar la cita en data", error);
+    throw error;
+  } finally {
+    if (connectionPool) {
+      await connectionPool.close();
+      connectionPool = null;
+    }
+  }
+}
+
+export async function desconfirmarCitaDB(
+  cita: number,
+  documento: string,
+  citTipoDoc: string,
+  citFolio: number,
+  citProcedimiento: string
+) {
+  try {
+    await initializeDBConnection();
+    const resultCita =
+      await sql.query`UPDATE CITMED SET CITESTP ='R', CITCANCEP='N' WHERE CITNUM=${cita};
+        UPDATE CITMED1 SET CITESTA='R', CITCANCE='N' WHERE CITNUM=${cita};
+        UPDATE CITMED3 SET CITPROEST='R' WHERE CITNUM=${cita};
+        UPDATE CITMED2 SET CITCANCEM='N' WHERE CITNUM=${cita};
+        DELETE FROM CTRLCITAS WHERE CITNUM=${cita} AND  CITSTSCIT <>'R';
+        UPDATE HCCOM5 SET HCPRSTGR='O' WHERE HISCKEY=${documento} AND HISTIPDOC=${citTipoDoc} AND HISCSEC=${citFolio} AND HCPRCCOD=${citProcedimiento};
+        UPDATE HCCOM51 SET HCPRCEST='O' WHERE HISCKEY=${documento} AND HISTIPDOC=${citTipoDoc} AND HISCSEC=${citFolio} AND HCPRCCOD=${citProcedimiento};`;
+    return resultCita.rowsAffected;
+  } catch (error) {
+    console.log("Error al desconfirmar cita en data", error);
+    throw error;
+  } finally {
+    if (connectionPool) {
+      await connectionPool.close();
+      connectionPool = null;
+    }
+  }
+}
+
+export async function consultaCitasDB(documento: string) {
+  if (!documento || documento.trim() === "") {
+    throw new Error("Invalid appointment number");
+  }
+  const today = new Date().toISOString().split('T')[0];
+  try {
+    await initializeDBConnection();
+    const resultCita =
+      await sql.query`SELECT c.citnum NumCitPac, c.cittipdoc TipDocPac, c.citced NumDocPac, cb.MPNOMC NombPac,
+                CASE 
+                    WHEN c.citesta = 'R' THEN 'RESERVADA' 
+                    WHEN c.citesta = 'C' THEN 'CONFIRMADA' 
+                    WHEN c.citesta = 'I' THEN 'INCUMPLIDA' 
+                    WHEN c.citesta = 'N' THEN 'CANCELADA' END EstCitPac,
+                m.menome NomEspCit, cast(c.CitFecPa as date) FchCitPac, CitNomAut HorCitPac, md.mmnomm NomEspcCit, 
+                CitProCod CodProCit, mp.prnomb NomProCit, cb.MpTele2 TelPac
+                FROM citmed1 c
+                INNER JOIN citmed2 c2 ON (c.citnum = c2.citnum AND c.citemp = c2.citemp AND c.citsed = c2.citsed)
+                INNER JOIN citmed3 c3 ON (c.citnum = c3.citnum AND c.citemp = c3.citemp AND c.citsed = c3.citsed)
+                INNER JOIN maeesp m ON (c2.mecode = m.mecode)
+                INNER JOIN maemed1 md ON (c2.MMCODM = md.mmcodm)
+                INNER JOIN CAPBAS cb ON (c.citced = cb.MPCedu AND c.cittipdoc = cb.MPTDoc) 
+                INNER JOIN maepro mp ON (c3.citprocod = mp.prcodi)
+                WHERE c.citfecpa >= ${today} AND c.citesta IN ('R','C','I','N') AND c.citced = ${documento}
+                ORDER BY 7`;
+    return resultCita.recordset;
+  } catch (error) {
+    console.log("Error al consultar la cita en data", error);
     throw error;
   } finally {
     if (connectionPool) {
