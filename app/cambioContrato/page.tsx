@@ -62,6 +62,7 @@ export default function CambioContrato() {
         const resultado = await consultaContratos(documento);
         console.log("Resultado de la busqueda de consultaContratos", resultado);
         setContratos(resultado);
+        setError("");
       } else {
         setError("El documento es obligatorio.");
       }
@@ -143,7 +144,7 @@ export default function CambioContrato() {
         />
       </Box>
       <Button variant="contained" color="primary" onClick={handleAsignarCama}>
-        Asignar Cama
+        Cambiar contrato
       </Button>
       {resultado && (
         <Typography variant="body1" color="textPrimary">
